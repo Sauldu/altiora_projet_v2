@@ -1,0 +1,16 @@
+{
+  "name": "Altiora Knowledge",
+  "description": "Workspace dédié à l'assistant Altiora pour la gestion du cycle de vie des tests logiciels. Contient spécifications, scénarios de test, scripts et documentation.",
+  "vector_db": "lancedb",
+  "embedding": {
+    "provider": "ollama",
+    "model": "nomic-embed-text",
+    "dimensions": 768,
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "batch_size": 8
+  },
+  "max_document_size_mb": 50,
+  "auto_sync": true,
+  "default_prompt_mode": "thinking"
+}

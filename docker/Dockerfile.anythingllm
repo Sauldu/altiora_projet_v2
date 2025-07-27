@@ -1,0 +1,24 @@
+FROM mintplexlabs/anythingllm:latest
+
+LABEL maintainer="Altiora Team <contact@altiora.fr>"
+LABEL description="AnythingLLM avec configuration Altiora Knowledge"
+
+ENV ALTIORA_WORKSPACE="Altiora Knowledge" \
+    RAG_MAX_CHUNK_SIZE=512 \
+    RAG_OVERLAP=50 \
+    EMBEDDING_MODEL="bge-large-en" \
+    VECTOR_CACHE_SIZE=1000
+
+COPY anythingllm/workspace_config.json /app/server/storage/altiora_config.json
+COPY anythingllm/chat_templates/ /app/server/storage/chat_templates/
+COPY anythingllm/prompts/ /app/server/storage/prompts/
+COPY anythingllm/agents/ /app/server/storage/agents/
+
+COPY scripts/setup/anythingllm-init.sh /docker-entrypoint-initdb.d/
+RUN chmod +x /docker-entrypoint-initdb.d/anythingllm-init.sh
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+    CMD curl -f http://localhost:3001/api/health || exit 1
+
+VOLUME ["/app/server/storage", "/app/server/uploads"]
+EXPOSE 3001

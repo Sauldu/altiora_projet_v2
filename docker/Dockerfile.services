@@ -1,0 +1,24 @@
+# Image de base commune pour tous les microservices
+FROM python:3.11-slim
+
+LABEL maintainer="Altiora Team <contact@altiora.fr>"
+LABEL description="Base image pour les microservices Altiora"
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+RUN groupadd -r altiora && useradd -r -g altiora altiora
+
+WORKDIR /app
+COPY --chown=altiora:altiora requirements/base.txt ./requirements/
+COPY --chown=altiora:altiora backend/altiora/utils ./altiora/utils
+COPY --chown=altiora:altiora backend/altiora/config ./altiora/config
+
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install -r requirements/base.txt && \
+    chown -R altiora:altiora /app
+
+USER altiora
+ENTRYPOINT ["python", "-m"]

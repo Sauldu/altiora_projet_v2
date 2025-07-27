@@ -1,0 +1,303 @@
+version: '3.8'
+
+services:
+  # ==========================
+  # Infrastructure de base
+  # ==========================
+  redis:
+    image: redis:7-alpine
+    container_name: altiora-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    command: >
+      redis-server
+      --appendonly yes
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --maxmemory ${REDIS_MAXMEMORY:-8gb}
+      --maxmemory-policy allkeys-lru
+      --lazyfree-lazy-eviction yes
+      --lazyfree-lazy-expire yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - altiora-network
+
+  # ==========================
+  # Backend principal
+  # ==========================
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: altiora-backend
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./models:/app/models:ro
+      - ./logs/backend:/app/logs
+      - ./data:/app/data
+      - ./config:/app/config:ro
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - QWEN3_MODEL_PATH=/app/models/qwen3-32b-q4_k_m.gguf
+      - STARCODER_MODEL_PATH=/app/models/starcoder2-15b-q8_0.gguf
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - altiora-network
+    deploy:
+      resources:
+        limits:
+          memory: 24G
+          cpus: '16'
+
+  # ==========================
+  # Microservices
+  # ==========================
+  ocr-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.services
+      target: runtime
+    container_name: altiora-ocr
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "${OCR_PORT:-8001}:8001"
+    volumes:
+      - ./data/input:/data/input:ro
+      - ./data/processed:/data/processed
+      - ./temp/ocr:/tmp/ocr_temp
+    environment:
+      - SERVICE_NAME=ocr
+      - REDIS_URL=redis://redis:6379
+      - CACHE_TTL=86400
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - altiora-network
+    profiles:
+      - services
+
+  alm-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.services
+      target: runtime
+    container_name: altiora-alm
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "${ALM_PORT:-8002}:8002"
+    environment:
+      - SERVICE_NAME=alm
+      - REDIS_URL=redis://redis:6379
+      - ALM_API_URL=${ALM_API_URL:-http://alm-server:8080}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - altiora-network
+    profiles:
+      - services
+
+  excel-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.services
+      target: runtime
+    container_name: altiora-excel
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "${EXCEL_PORT:-8003}:8003"
+    volumes:
+      - ./data/matrices:/data/matrices
+      - ./templates:/templates:ro
+    environment:
+      - SERVICE_NAME=excel
+      - REDIS_URL=redis://redis:6379
+      - TEMPLATE_PATH=/templates
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - altiora-network
+    profiles:
+      - services
+
+  playwright-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.services
+      target: runtime
+    container_name: altiora-playwright
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "${PLAYWRIGHT_PORT:-8004}:8004"
+    volumes:
+      - ./tests/generated:/tests
+      - ./reports:/reports
+      - ./screenshots:/screenshots
+      - ./videos:/videos
+    environment:
+      - SERVICE_NAME=playwright
+      - REDIS_URL=redis://redis:6379
+      - HEADED=${HEADED:-false}
+      - BROWSER=${BROWSER:-chromium}
+      - PARALLEL_WORKERS=${PARALLEL_WORKERS:-4}
+    cap_add:
+      - SYS_ADMIN
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - altiora-network
+    profiles:
+      - services
+
+  # ==========================
+  # AnythingLLM avec RAG
+  # ==========================
+  anythingllm:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.anythingllm
+    container_name: altiora-anythingllm
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - backend
+    ports:
+      - "${ANYTHINGLLM_PORT:-3001}:3001"
+    volumes:
+      - anythingllm-storage:/app/server/storage
+      - ./data:/app/data:ro
+      - ./docs:/app/docs:ro
+    environment:
+      - ANYTHINGLLM_STORAGE=/app/server/storage
+      - VECTOR_DB_URL=redis://redis:6379
+      - WORKSPACE_NAME=Altiora Knowledge
+      - ENABLE_RAG=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - altiora-network
+    profiles:
+      - ui
+
+  # ==========================
+  # Dashboard Altiora (Dash)
+  # ==========================
+  dashboard:
+    build:
+      context: .
+      dockerfile: services/dash/Dockerfile
+    container_name: altiora-dashboard
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    ports:
+      - "${DASHBOARD_PORT:-8050}:8050"
+    volumes:
+      - ./src/dashboard:/app
+      - ./logs/dashboard:/app/logs
+    environment:
+      - PROMETHEUS_URL=http://prometheus:9090
+      - BACKEND_URL=http://backend:8000
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8050/_dash-layout"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - altiora-network
+    profiles:
+      - ui
+
+  # ==========================
+  # Monitoring avec Prometheus
+  # ==========================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: altiora-prometheus
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    networks:
+      - altiora-network
+    profiles:
+      - monitoring
+
+# ==========================
+# Volumes persistants
+# ==========================
+volumes:
+  redis-data:
+    driver: local
+  anythingllm-storage:
+    driver: local
+  prometheus-data:
+    driver: local
+
+# ==========================
+# Réseau interne
+# ==========================
+networks:
+  altiora-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ==========================
+# Profiles d'utilisation
+# ==========================
+# docker-compose up              # Backend + Redis seulement
+# docker-compose --profile services up    # + Tous microservices
+# docker-compose --profile ui up          # + AnythingLLM + Dashboard
+# docker-compose --profile monitoring up  # + Prometheus

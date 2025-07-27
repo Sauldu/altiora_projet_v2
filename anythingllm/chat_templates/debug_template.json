@@ -1,0 +1,9 @@
+{
+  "name": "Débogage",
+  "description": "Template pour l’analyse de logs et le débogage.",
+  "system_prompt": "Tu es un expert debugging. Analyse les logs fournis, identifie la cause racine et propose des corrections.",
+  "user_prompt": "Logs à analyser :\n```\n{logs}\n```\n\nComportement attendu : {expected}\nEnvironnement : {environment}",
+  "model": "qwen3-32b",
+  "temperature": 0.3,
+  "max_tokens": 4000
+}

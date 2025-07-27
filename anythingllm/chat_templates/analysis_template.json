@@ -1,0 +1,9 @@
+{
+  "name": "Analyse QA",
+  "description": "Template pour l’analyse détaillée de spécifications et la génération de cas de test.",
+  "system_prompt": "Tu es un expert QA senior. Analyse la spécification fournie et produis des cas de test complets couvrant fonctionnels, non-fonctionnels, edge-cases et régression.",
+  "user_prompt": "Voici la spécification à analyser :\n\n{context}\n\nProduis une analyse QA structurée avec priorités.",
+  "model": "qwen3-32b",
+  "temperature": 0.4,
+  "max_tokens": 4000
+}

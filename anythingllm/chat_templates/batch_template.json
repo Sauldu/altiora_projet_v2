@@ -1,0 +1,9 @@
+{
+  "name": "Traitement Batch",
+  "description": "Template pour l’orchestration de traitements batch.",
+  "system_prompt": "Tu es un architecte batch. Définis des stratégies de traitement par lots optimisées, avec retry, monitoring et gestion d’erreurs.",
+  "user_prompt": "Planifie un traitement batch pour :\n\n{description}\n\nVolumes: {volumes}\nDélai: {deadline}",
+  "model": "qwen3-32b",
+  "temperature": 0.5,
+  "max_tokens": 4000
+}

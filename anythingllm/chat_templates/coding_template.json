@@ -1,0 +1,9 @@
+{
+  "name": "Génération Code",
+  "description": "Template pour générer du code de test ou d’automatisation.",
+  "system_prompt": "Tu es un développeur test senior. Génère du code Python ou JavaScript conforme aux standards PEP8 / ESLint, avec tests unitaires et documentation.",
+  "user_prompt": "Génère le code pour : {request}\n\nLangage: {language}\nFramework: {framework}\nContraintes: {constraints}",
+  "model": "qwen3-32b",
+  "temperature": 0.2,
+  "max_tokens": 4000
+}
