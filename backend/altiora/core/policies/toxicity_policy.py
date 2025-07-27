@@ -1,4 +1,4 @@
-# policies/toxicity_policy.py
+# backend/altiora/core/policies/toxicity_policy.py
 """Politique de détection de toxicité et de PII pour Altiora.
 
 Ce module combine une analyse rapide basée sur des expressions régulières locales

@@ -1,4 +1,4 @@
-# policies/business_rules.py
+# backend/altiora/core/policies/business_rules.py
 """Module de validation des règles métier pour les artefacts générés.
 
 Ce module garantit que les artefacts produits par l'IA (comme les scripts de test

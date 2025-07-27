@@ -1,4 +1,4 @@
-# src/validation/continuous_validator.py
+# backend/altiora/core/validation/continuous_validator.py
 """Module pour la validation continue des modifications de code.
 
 Ce module implémente un système de validation continue qui permet de

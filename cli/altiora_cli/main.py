@@ -1,4 +1,4 @@
-# cli/main.py
+# cli/altiora_cli/main.py
 """Point d'entrée principal pour l'interface en ligne de commande (CLI) d'Altiora.
 
 Ce module utilise la bibliothèque `click` pour créer une CLI robuste et facile à utiliser.

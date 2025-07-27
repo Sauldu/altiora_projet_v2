@@ -1,4 +1,4 @@
-# src/audit/decorator.py
+# backend/altiora/infrastructure/audit/decorator.py
 """Décorateur pour l'audit des fonctions asynchrones.
 
 Ce module fournit un décorateur `@audit` qui permet d'enregistrer

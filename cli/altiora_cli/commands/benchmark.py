@@ -1,4 +1,4 @@
-# cli/commands/benchmark.py
+# cli/altiora_cli/commands/benchmark.py
 """Commande `benchmark` pour la CLI Altiora.
 
 Ce module fournit une commande pour lancer les tests de performance

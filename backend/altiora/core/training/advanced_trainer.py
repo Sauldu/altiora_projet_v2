@@ -1,4 +1,4 @@
-# src/training/advanced_trainer.py
+# backend/altiora/core/training/advanced_trainer.py
 """Module pour l'entraînement avancé (fine-tuning) des modèles de langage (LLMs).
 
 Ce module fournit une classe `AltioraModelTrainer` pour le fine-tuning de

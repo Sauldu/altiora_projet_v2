@@ -1,4 +1,4 @@
-# src/training/__init__.py
+# backend/altiora/core/training/__init__.py
 """Initialise le package `training` de l'application Altiora.
 
 Ce package contient les modules et scripts liés à l'entraînement et au

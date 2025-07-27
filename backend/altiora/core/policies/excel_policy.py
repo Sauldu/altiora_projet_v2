@@ -1,4 +1,4 @@
-# policies/excel_policy.py
+# backend/altiora/core/policies/excel_policy.py
 """Module contenant les règles de validation pour les matrices de test.
 
 Ce module garantit l'intégrité des données destinées à être exportées

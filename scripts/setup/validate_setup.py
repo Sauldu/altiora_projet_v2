@@ -1,3 +1,4 @@
+# scripts/setup/validate_setup.py
 #!/usr/bin/env python3
 """Script de validation complet pour l'environnement de développement Altiora.
 

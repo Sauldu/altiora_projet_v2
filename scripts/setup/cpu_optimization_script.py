@@ -1,3 +1,4 @@
+# scripts/setup/cpu_optimization_script.py
 #!/usr/bin/env python3
 """Script d'optimisation des performances CPU pour les adaptateurs LoRA.
 

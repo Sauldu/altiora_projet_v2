@@ -1,4 +1,4 @@
-# post_processing/excel_formatter.py
+# backend/altiora/core/post_processing/excel_formatter.py
 """Module pour formater et styliser des données dans des fichiers Excel.
 
 Ce module utilise pandas et openpyxl pour créer des fichiers Excel esthétiques

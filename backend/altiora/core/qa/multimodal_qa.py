@@ -1,4 +1,4 @@
-# src/qa_system/multimodal_qa.py
+# backend/altiora/core/qa/multimodal_qa.py
 from src.models.qwen_model import QwenModel
 from src.models.starcoder_model import StarcoderModel
 from src.utils.question_router import QuestionRouter

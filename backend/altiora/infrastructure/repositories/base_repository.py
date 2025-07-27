@@ -1,3 +1,4 @@
+# backend/altiora/infrastructure/repositories/base_repository.py
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Optional
 

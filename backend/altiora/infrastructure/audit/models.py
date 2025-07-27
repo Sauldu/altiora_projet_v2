@@ -1,4 +1,4 @@
-# src/audit/models.py
+# backend/altiora/infrastructure/audit/models.py
 """Modèles de données pour les événements d'audit.
 
 Ce module définit la structure des événements d'audit qui sont enregistrés

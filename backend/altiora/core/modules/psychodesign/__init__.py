@@ -1,4 +1,4 @@
-# src/modules/psychodesign/__init__.py
+# backend/altiora/core/modules/psychodesign/__init__.py
 """Initialise le sous-package `psychodesign`.
 
 Ce package est dédié à la gestion de la personnalité de l'IA Altiora,

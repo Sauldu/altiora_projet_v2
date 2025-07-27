@@ -1,4 +1,4 @@
-# src/optimization/memory_optimizer.py
+# backend/altiora/core/optimization/memory_optimizer.py
 """Module pour l'optimisation avancée de la mémoire lors du chargement des modèles d'IA.
 
 Ce module fournit des stratégies pour réduire l'empreinte mémoire des modèles

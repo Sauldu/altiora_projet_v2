@@ -1,12 +1,12 @@
 # backend/altiora/api/app.py
 """
-FastAPI application bootstrap.
+Bootstrap de l'application FastAPI.
 
-Handles:
-- API v1 routing
-- Global middleware
-- Lifespan events
-- OpenAPI docs
+Gère :
+- Le routage de l'API v1
+- Les middlewares globaux
+- Les événements de cycle de vie
+- La documentation OpenAPI
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
-    """Startup / shutdown lifecycle."""
+    """Cycle de vie de démarrage / arrêt."""
     setup_logging()
     logger.info("🚀 %s v%s starting", __title__, __version__)
     yield
@@ -51,7 +51,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Global middleware
+# Middleware global
 app.add_middleware(GZipMiddleware, minimum_size=1024)
 app.add_middleware(
     CORSMiddleware,
@@ -61,7 +61,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Routers
+# Routeurs
 app.include_router(health.router, prefix="/health", tags=["health"])
 app.include_router(analysis.router, prefix="/api/v1/analysis", tags=["analysis"])
 app.include_router(batch.router, prefix="/api/v1/batch", tags=["batch"])

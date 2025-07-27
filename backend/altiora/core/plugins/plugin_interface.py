@@ -1,4 +1,4 @@
-# src/plugins/plugin_interface.py
+# backend/altiora/core/plugins/plugin_interface.py
 """Module définissant l'interface de base pour les plugins et un gestionnaire de plugins simple.
 
 Ce module établit le contrat que tout plugin doit respecter pour être intégré

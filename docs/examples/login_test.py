@@ -1,3 +1,4 @@
+# docs/examples/login_test.py
 """
 Exemple de test Playwright généré automatiquement.
 

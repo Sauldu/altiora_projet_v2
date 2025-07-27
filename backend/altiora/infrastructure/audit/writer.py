@@ -1,4 +1,4 @@
-# src/audit/writer.py
+# backend/altiora/infrastructure/audit/writer.py
 """Writer asynchrone pour les événements d'audit.
 
 Ce module fournit une classe `AsyncAuditWriter` qui collecte les événements

@@ -1,3 +1,4 @@
+# backend/altiora/security/guardrails/ethical_safeguards.py
 """
 Module de garde-fous éthiques pour Altiora
 Détection d'anomalies, limites comportementales, et alertes

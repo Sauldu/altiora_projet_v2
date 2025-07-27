@@ -1,9 +1,9 @@
 # backend/altiora/__version__.py
 """
-Centralized version management for Altiora V2.
+Gestion centralisée des versions pour Altiora V2.
 
-This single source of truth is imported everywhere in the codebase
-to ensure consistent versioning across backend, CLI and Docker images.
+Cette source unique de vérité est importée partout dans la base de code
+pour assurer une gestion cohérente des versions à travers le backend, la CLI et les images Docker.
 """
 
 from __future__ import annotations
@@ -18,15 +18,15 @@ __email__ = "pauldemoura@ik.me"
 __license__ = "MIT"
 __copyright__ = f"2025 {__author__}"
 
-# API compatibility aliases
+# Alias de compatibilité API
 VERSION = __version__
 VERSION_INFO = tuple(map(int, __version__.split(".")))
 
-# Pre-release / build metadata
-__build__ = None  # Set by CI/CD pipeline
-__commit__ = None  # Git commit hash, set by CI/CD
+# Métadonnées de pré-version / build
+__build__ = None  # Défini par le pipeline CI/CD
+__commit__ = None  # Hash du commit Git, défini par le pipeline CI/CD
 
-# Public API
+# API Publique
 __all__ = [
     "__title__",
     "__description__",

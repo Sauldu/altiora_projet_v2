@@ -1,4 +1,4 @@
-# src/rbac/__init__.py
+# backend/altiora/security/rbac/__init__.py
 """Initialise le package `rbac` (Role-Based Access Control) de l'application Altiora.
 
 Ce package contient les composants nécessaires à la gestion des permissions

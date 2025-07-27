@@ -1,4 +1,4 @@
-# src/rbac/models.py
+# backend/altiora/security/rbac/models.py
 """Modèles de données pour le contrôle d'accès basé sur les rôles (RBAC).
 
 Ce module définit les structures de données Pydantic pour représenter

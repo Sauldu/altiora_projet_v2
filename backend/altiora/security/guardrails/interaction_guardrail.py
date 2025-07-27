@@ -1,4 +1,4 @@
-# guardrails/interaction_guardrail.py
+# backend/altiora/security/guardrails/interaction_guardrail.py
 """Gardien des interactions en temps réel pour Altiora.
 
 Ce module agit comme un portail de sécurité pour toutes les entrées utilisateur.

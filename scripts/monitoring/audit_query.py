@@ -1,4 +1,4 @@
-# scripts/audit_query.py
+# scripts/monitoring/audit_query.py
 """Script pour interroger les journaux d'audit compressés.
 
 Ce script parcourt les fichiers de log d'audit (`.jsonl.zst`) dans le répertoire `logs/audit`,

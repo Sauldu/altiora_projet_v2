@@ -2,7 +2,7 @@ from typing import List
 import asyncio
 from src.ensemble.voting_strategies import WeightedVoting
 
-# src/ensemble/multi_model.py
+# backend/altiora/core/models/ensemble/multi_model.py
 class MultiModelEnsemble:
     def __init__(self, models: List[str]):
         self.models = self.load_models(models)

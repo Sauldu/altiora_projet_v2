@@ -1,4 +1,4 @@
-# src/modules/psychodesign/personality_evolution.py
+# backend/altiora/core/modules/psychodesign/personality_evolution.py
 """Module pour gérer l'évolution de la personnalité de l'IA via le fine-tuning supervisé.
 
 Ce module orchestre le processus d'entraînement LoRA en arrière-plan en utilisant

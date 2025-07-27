@@ -1,4 +1,4 @@
-# src/monitoring/healthcheck.py
+# backend/altiora/infrastructure/monitoring/healthcheck.py
 """Service de vérification de l'état de santé (Health Check) pour les composants critiques d'Altiora.
 
 Ce module fournit un point de terminaison `/health` qui agrège l'état de

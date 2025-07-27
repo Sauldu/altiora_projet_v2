@@ -1,4 +1,4 @@
-# cli/commands/quickstart.py
+# cli/altiora_cli/commands/quickstart.py
 """Commande `quickstart` pour la CLI Altiora.
 
 Ce module fournit un assistant interactif pour configurer rapidement un projet Altiora.

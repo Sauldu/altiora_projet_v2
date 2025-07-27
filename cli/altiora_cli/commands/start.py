@@ -1,4 +1,4 @@
-# cli/commands/start.py
+# cli/altiora_cli/commands/start.py
 """Commande `start` pour la CLI Altiora."""
 
 import click

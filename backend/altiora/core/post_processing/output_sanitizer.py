@@ -1,4 +1,4 @@
-# post_processing/output_sanitizer.py
+# backend/altiora/core/post_processing/output_sanitizer.py
 """Module pour nettoyer et assainir les sorties brutes des modèles de langage (LLM).
 
 Ce module est essentiel pour normaliser les réponses des LLM avant qu'elles ne soient

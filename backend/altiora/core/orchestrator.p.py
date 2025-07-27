@@ -16,6 +16,7 @@ from altiora.core.models.model_swapper import ModelSwapper
 
 
 class AltioraOrchestrator:
+    """Orchestre le flux de traitement des requêtes en gérant le chargement des modèles."""
     def __init__(self):
         """Initialise avec le swapper de modèles."""
         self.model_swapper = ModelSwapper()

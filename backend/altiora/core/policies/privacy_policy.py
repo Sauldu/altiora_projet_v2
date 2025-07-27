@@ -1,4 +1,4 @@
-# policies/privacy_policy.py
+# backend/altiora/core/policies/privacy_policy.py
 """Moteur de politique de confidentialité pour Altiora, centré sur l'utilisateur français.
 
 Ce module fournit des fonctionnalités essentielles pour la conformité RGPD :

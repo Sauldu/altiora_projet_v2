@@ -1,4 +1,5 @@
 # docs/generate_docs.py
+# docs/generate_docs.py
 """Module pour la génération automatisée de la documentation du projet Altiora.
 
 Ce script centralise la création de divers artefacts de documentation,

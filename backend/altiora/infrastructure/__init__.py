@@ -1,4 +1,4 @@
 # backend/altiora/infrastructure/__init__.py
 """
-Infrastructure layer – cache, queue, monitoring, audit, scaling.
+Couche d'infrastructure – cache, file d'attente, monitoring, audit, scaling.
 """

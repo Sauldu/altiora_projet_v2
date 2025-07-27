@@ -1,4 +1,4 @@
-# toxicity_guardrail.py
+# backend/altiora/security/guardrails/toxicity_guardrail.py
 """
 Real-time toxicity & PII guardrail wrapper for Altiora
 – plugs into every user interaction and enforces the privacy/toxicity policy

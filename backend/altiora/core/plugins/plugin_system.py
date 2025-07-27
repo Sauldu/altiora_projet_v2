@@ -1,4 +1,4 @@
-# src/plugins/plugin_system.py
+# backend/altiora/core/plugins/plugin_system.py
 """Module implémentant un système de plugins dynamique pour l'application Altiora.
 
 Ce système permet de charger des plugins à partir d'un répertoire spécifié,

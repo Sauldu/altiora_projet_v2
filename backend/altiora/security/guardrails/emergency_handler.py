@@ -1,4 +1,4 @@
-# emergency_handler.py
+# backend/altiora/security/guardrails/emergency_handler.py
 """
 Emergency mode & alerting for Altiora
 - Triggers: critical toxicity / PII leak / service crash

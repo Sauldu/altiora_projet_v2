@@ -1,3 +1,4 @@
+# backend/altiora/security/guardrails/admin_control_system.py
 """
 Système de Contrôle Administrateur pour Altiora
 Admin unique avec contrôle total et monitoring en temps réel

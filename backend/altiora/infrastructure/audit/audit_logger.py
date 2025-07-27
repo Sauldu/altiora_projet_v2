@@ -1,4 +1,4 @@
-# src/audit/audit_logger.py
+# backend/altiora/infrastructure/audit/audit_logger.py
 """Module pour la journalisation des actions d'audit dans l'application.
 
 Ce module fournit une classe `AuditLogger` pour enregistrer les actions

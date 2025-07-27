@@ -1,4 +1,4 @@
-# src/events/event_bus.py
+# backend/altiora/infrastructure/events/event_bus.py
 """Module implémentant un bus d'événements asynchrone pour la communication inter-composants.
 
 Ce bus d'événements permet aux différents modules de l'application de communiquer

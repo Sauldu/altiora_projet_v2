@@ -1,4 +1,5 @@
 # backend/altiora/monitoring/memory_monitor.py
+"""Module de surveillance de l'utilisation de la mémoire."""
 class MemoryMonitor:
     """Surveille l'utilisation mémoire en temps réel."""
 

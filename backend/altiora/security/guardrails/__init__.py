@@ -1,4 +1,4 @@
-# guardrails/__init__.py
+# backend/altiora/security/guardrails/__init__.py
 from .admin_control_system import AdminControlSystem
 from .admin_dashboard import AdminDashboard
 from .ethical_safeguards import EthicalSafeguards

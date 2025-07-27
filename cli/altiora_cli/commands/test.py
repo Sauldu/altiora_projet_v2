@@ -1,4 +1,4 @@
-# cli/commands/test.py
+# cli/altiora_cli/commands/test.py
 """Commande `test` pour la CLI Altiora."""
 
 import click

@@ -1,5 +1,5 @@
-"""
-Dashboard administrateur pour supervision Altiora
+# backend/altiora/security/guardrails/admin_dashboard.py
+"""Dashboard administrateur pour supervision Altiora
 Interface de contrôle visuelle et rapports en temps réel
 """
 

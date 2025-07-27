@@ -1,4 +1,4 @@
-# src/modules/__init__.py
+# backend/altiora/core/modules/__init__.py
 """Initialise le package `modules` de l'application Altiora.
 
 Ce package contient des modules fonctionnels spécifiques qui peuvent être

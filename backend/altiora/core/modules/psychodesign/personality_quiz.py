@@ -1,4 +1,4 @@
-# src/modules/psychodesign/personality_quiz.py
+# backend/altiora/core/modules/psychodesign/personality_quiz.py
 """Module pour le quiz de personnalisation de l'IA Altiora.
 
 Ce module permet de définir le profil initial de la personnalité de l'IA

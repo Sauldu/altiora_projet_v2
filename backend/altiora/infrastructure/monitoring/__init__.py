@@ -1,4 +1,4 @@
-# src/monitoring/__init__.py
+# backend/altiora/infrastructure/monitoring/__init__.py
 """Initialise le package `monitoring` de l'application Altiora.
 
 Ce package contient les modules liés à la surveillance et à l'observabilité

@@ -1,3 +1,4 @@
+# scripts/monitoring/diagnose_ollama.py
 #!/usr/bin/env python3
 """Script de diagnostic pour identifier les problèmes de réponse avec Ollama.
 

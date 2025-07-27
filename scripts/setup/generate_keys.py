@@ -1,3 +1,4 @@
+# scripts/setup/generate_keys.py
 #!/usr/bin/env python3
 """Script pour générer les secrets nécessaires et les enregistrer dans un fichier .env.
 

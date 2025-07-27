@@ -1,4 +1,4 @@
-# src/audit/ring_buffer.py
+# backend/altiora/infrastructure/audit/ring_buffer.py
 """Implémentation d'un tampon circulaire (ring buffer) pour les événements d'audit.
 
 Ce module fournit une structure de données de type tampon circulaire qui stocke

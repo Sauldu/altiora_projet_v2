@@ -1,3 +1,4 @@
+# scripts/monitoring/generate_performance_report.py
 #!/usr/bin/env python3
 """Génère un rapport de performance HTML et PNG à partir de métriques.
 

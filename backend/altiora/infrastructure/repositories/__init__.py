@@ -1,4 +1,4 @@
-# src/repositories/__init__.py
+# backend/altiora/infrastructure/repositories/__init__.py
 """Initialise le package `repositories` de l'application Altiora.
 
 Ce package contient les dépôts (repositories) qui gèrent l'accès aux données

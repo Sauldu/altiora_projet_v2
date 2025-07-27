@@ -1,4 +1,4 @@
-# src/audit/rotation.py
+# backend/altiora/infrastructure/audit/rotation.py
 """Module pour la rotation et l'archivage sécurisé des journaux d'audit.
 
 Ce module gère la rotation mensuelle des fichiers de log d'audit.

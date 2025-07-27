@@ -1,4 +1,4 @@
-# src/rbac/manager.py
+# backend/altiora/security/rbac/manager.py
 """Module de gestion du contrôle d'accès basé sur les rôles (RBAC).
 
 Ce module fournit une classe `RBACManager` qui charge les définitions de rôles

@@ -1,4 +1,4 @@
-# post_processing/code_validator.py
+# backend/altiora/core/post_processing/code_validator.py
 """Module pour la validation complète du code Python et Playwright généré.
 
 Ce module fournit une classe `CodeValidator` qui effectue plusieurs vérifications

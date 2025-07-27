@@ -1,4 +1,4 @@
-# src/qa_system/qa_system.py
+# backend/altiora/core/qa/qa_system.py
 """Module implémentant le système de Question-Réponse (QA) pour l'application Altiora.
 
 Ce module fournit une interface pour interagir avec les modèles de langage

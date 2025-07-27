@@ -1,4 +1,4 @@
-# cli/commands/doctor.py
+# cli/altiora_cli/commands/doctor.py
 """Commande `doctor` pour la CLI Altiora.
 
 Ce module fournit un outil de diagnostic complet pour vérifier l'état de

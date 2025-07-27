@@ -1,4 +1,4 @@
-# src/plugins/__init__.py
+# backend/altiora/core/plugins/__init__.py
 """Initialise le package `plugins` de l'application Altiora.
 
 Ce package contient le système de plugins qui permet d'étendre les

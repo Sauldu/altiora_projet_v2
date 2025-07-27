@@ -1,4 +1,4 @@
-# src/modules/psychodesign/altiora_core.py
+# backend/altiora/core/modules/psychodesign/altiora_core.py
 """Noyau de personnalité et d'apprentissage supervisé pour l'IA Altiora.
 
 Ce module gère les traits de personnalité de l'IA, son évolution via le

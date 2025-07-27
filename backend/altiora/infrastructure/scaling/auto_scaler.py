@@ -1,4 +1,4 @@
-# src/scaling/auto_scaler.py
+# backend/altiora/infrastructure/scaling/auto_scaler.py
 """Module implémentant un auto-scaler intelligent basé sur l'apprentissage automatique.
 
 Ce module fournit une logique de décision pour l'ajustement dynamique des

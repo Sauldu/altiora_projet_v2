@@ -1,4 +1,4 @@
-# src/security/secret_manager.py
+# backend/altiora/security/secret.py
 """Gestionnaire de secrets ultra-sécurisé pour l'application Altiora.
 
 Ce module fournit une classe `SecretsManager` qui gère l'accès aux secrets
