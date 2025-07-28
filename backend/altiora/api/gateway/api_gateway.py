@@ -16,7 +16,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 
 # Importation du système de QA (Question Answering).
-from src.qa_system.qa_system import QASystem
+from backend.altiora.core.qa.qa_system import QASystem
 
 logger = logging.getLogger(__name__)
 
