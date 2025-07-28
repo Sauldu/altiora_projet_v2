@@ -1,5 +1,5 @@
 Core
 ====
 
-.. automodule:: src.core
+.. automodule:: backend.altiora.core
    :members:

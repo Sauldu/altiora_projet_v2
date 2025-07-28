@@ -10,9 +10,14 @@ from typing import Any
 
 from prometheus_client import Counter, Histogram
 
+# --- Métriques du Cache ---
 cache_hits = Counter("cache_hits_total", "Total cache hits")
 cache_misses = Counter("cache_misses_total", "Total cache misses")
 cache_latency = Histogram("cache_latency_seconds", "Cache operation latency")
+
+# --- Métriques du Model Swapper ---
+model_swap_total = Counter("model_swap_total", "Total number of model swaps", ["model_name"])
+model_swap_latency = Histogram("model_swap_latency_seconds", "Latency of model swaps", ["model_name"])
 
 
 class CacheMetrics:

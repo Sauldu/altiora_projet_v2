@@ -1,5 +1,5 @@
 Services
 ========
 
-.. automodule:: services
+.. automodule:: backend.altiora.services
    :members:

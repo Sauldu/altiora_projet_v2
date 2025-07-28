@@ -1,5 +1,5 @@
 Models
 ======
 
-.. automodule:: src.models
+.. automodule:: backend.altiora.core.models
    :members:

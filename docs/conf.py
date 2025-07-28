@@ -1,9 +1,6 @@
-
-# docs/conf.py
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -20,12 +17,11 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'myst_parser',
 ]
 
 templates_path = ['_templates']
 exclude_patterns = []
-
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -45,9 +41,13 @@ html_theme_options = {
         "**": ["page-toc", "edit-this-page", "sourcelink"],
         "index": [],
     },
-    "footer_items": ["copyright", "sphinx-version"],
     "pygment_light_style": "tango",
     "pygment_dark_style": "monokai",
-    "default_mode": "dark"
 }
 
+html_context = {
+    "github_user": "your_github_user",
+    "github_repo": "altiora_projet_v2",
+    "github_version": "main",
+    "doc_path": "docs",
+}
