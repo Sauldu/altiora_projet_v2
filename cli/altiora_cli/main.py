@@ -7,8 +7,11 @@ Il agrège toutes les commandes disponibles depuis le sous-package `cli.commands
 
 from pathlib import Path
 import click
-from cli.commands import init, start, test
-from cli.commands import doctor, quickstart, benchmark
+from cli.altiora_cli.commands import init, start, test
+from cli.altiora_cli.commands import doctor, quickstart, benchmark
+from cli.altiora_cli.commands.voice_anything import app as voice_anything_app
+
+app.add_typer(voice_anything_app, name="voice")
 
 @click.group(invoke_without_command=True)
 @click.pass_context

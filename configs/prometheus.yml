@@ -1,0 +1,9 @@
+# configs/prometheus.yml
+groups:
+  - name: altiora_lora
+    rules:
+      - alert: LoRA_Retrain_Needed
+        expr: altiora_feedback_count >= 50
+        for: 1m
+        annotations:
+          summary: "50+ feedbacks reçus, fine-tuning LoRA lancé"

@@ -3,13 +3,19 @@ import os
 import logging
 from pathlib import Path
 import json
-import typing
+from typing import List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
 
-def export_project_to_markdown(directory: str, output_file: str = "Altiora.md", split_count: int = 1):
-    """Exporte la structure et le contenu du projet dans un ou plusieurs fichiers Markdown."
+def export_project_to_markdown(
+    directory: str,
+    output_file: str = "Altiora.md",
+    split_count: int = 1,
+    exclude_tests: bool = False,
+    exclude_docs: bool = False
+):
+    """Exporte la structure et le contenu du projet dans un ou plusieurs fichiers Markdown.
 
     Cette fonction parcourt le répertoire du projet, filtre les fichiers et dossiers
     non pertinents, génère une arborescence du projet, et inclut le contenu des
@@ -21,21 +27,30 @@ def export_project_to_markdown(directory: str, output_file: str = "Altiora.md", 
         output_file: Le nom du fichier Markdown de sortie principal.
         split_count: Le nombre de fichiers Markdown en lesquels diviser la sortie.
                      Si > 1, les fichiers seront nommés `output_file_1.md`, `output_file_2.md`, etc.
+        exclude_tests: Si True, exclut le dossier 'test'.
+        exclude_docs: Si True, exclut le dossier 'docs'.
     """
-    # Dossiers à ignorer lors de l'exportation.
-    ignored_dirs = {
+    # Dossiers à ignorer par défaut
+    default_ignored_dirs = {
         ".git", "__pycache__", "venv", ".venv", "node_modules", ".idea",
         ".vscode", "External Libraries", ".pytest_cache", "Scratches and Consoles",
         "logs", "reports", "results", "cache", "benchmarks", "temp",
-        "altiora.egg-info", "data/models", # Ignorer spécifiquement data/models
+        "altiora.egg-info", "data/models",  # Ignorer spécifiquement data/models
     }
+
+    # Ajout conditionnel de 'test' et 'docs'
+    ignored_dirs = set(default_ignored_dirs)
+    if exclude_tests:
+        ignored_dirs.add("test")
+    if exclude_docs:
+        ignored_dirs.add("docs")
 
     # Fichiers à ignorer (inclut les fichiers de sortie générés par ce script).
     base_output_name = os.path.splitext(output_file)[0]
     ignored_files = {
         output_file,
         "export.py",
-        "structure.txt", # Le fichier structure.txt est généré séparément.
+        "structure.txt",  # Le fichier structure.txt est généré séparément.
     }
     # Ajoute les noms des fichiers de sortie divisés à la liste des ignorés.
     for i in range(1, split_count + 1):
@@ -53,7 +68,7 @@ def export_project_to_markdown(directory: str, output_file: str = "Altiora.md", 
         ".py": "python", ".js": "javascript", ".ts": "typescript",
         ".html": "html", ".css": "css", ".toml": "toml", ".md": "markdown",
         ".sh": "shell", ".yml": "yaml", ".yaml": "yaml", ".json": "json",
-        "qwen3_modelfile": "text", "starcoder2_modelfile": "text", # Fichiers spécifiques sans extension standard.
+        "qwen3_modelfile": "text", "starcoder2_modelfile": "text",  # Fichiers spécifiques sans extension standard.
         "makefile": "makefile", ".gitignore": "text", ".txt": "text", ".bak": "text"
     }
 
@@ -88,13 +103,13 @@ def export_project_to_markdown(directory: str, output_file: str = "Altiora.md", 
     structure_map = {}
     # Construit une représentation arborescente du projet.
     for path in sorted(file_paths):
-        parts = Path(path).parts # Utilise pathlib pour gérer les chemins de manière cross-platform.
+        parts = Path(path).parts  # Utilise pathlib pour gérer les chemins de manière cross-platform.
         current_level = structure_map
         for part in parts[:-1]:
             current_level = current_level.setdefault(part, {})
         current_level[parts[-1]] = None
 
-    def build_tree_string(d: Dict[str, Any], prefix: str = "") -> str:
+    def build_tree_string(d: dict, prefix: str = "") -> str:
         """Construit la chaîne de caractères représentant l'arborescence."""
         s = ""
         entries = sorted(d.keys())
@@ -128,7 +143,7 @@ def export_project_to_markdown(directory: str, output_file: str = "Altiora.md", 
                 code_block = f"```{lang}\n{content}\n```\n\n"
                 separator = "---\n\n"
                 full_entry = header + code_block + separator
-                entry_size = len(full_entry) # Taille en octets pour la répartition.
+                entry_size = len(full_entry)  # Taille en octets pour la répartition.
                 content_with_size.append((full_entry, entry_size))
         except Exception as e:
             # En cas d'erreur de lecture, ajoute un message d'erreur au lieu du contenu.
@@ -147,7 +162,7 @@ def export_project_to_markdown(directory: str, output_file: str = "Altiora.md", 
 
         # Répartit les entrées de contenu entre les différentes parties de manière équilibrée.
         for entry, size in content_with_size:
-            min_index = current_sizes.index(min(current_sizes)) # Trouve la partie la plus petite.
+            min_index = current_sizes.index(min(current_sizes))  # Trouve la partie la plus petite.
             current_parts[min_index].append(entry)
             current_sizes[min_index] += size
 
@@ -197,6 +212,21 @@ if __name__ == "__main__":
     parser.add_argument(
         "-s", "--split", type=int, default=1, help="Nombre de parties (ex: 2, 3, 4)."
     )
+    parser.add_argument(
+        "--exclude-tests", action="store_true",
+        help="Exclure le dossier 'test' lors de l'export."
+    )
+    parser.add_argument(
+        "--exclude-docs", action="store_true",
+        help="Exclure le dossier 'docs' lors de l'export."
+    )
+
     args = parser.parse_args()
 
-    export_project_to_markdown(".", output_file=args.output, split_count=args.split)
+    export_project_to_markdown(
+        ".",
+        output_file=args.output,
+        split_count=args.split,
+        exclude_tests=args.exclude_tests,
+        exclude_docs=args.exclude_docs
+    )

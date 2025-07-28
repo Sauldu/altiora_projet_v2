@@ -27,7 +27,7 @@ from backend.altiora.config.settings import settings
 from backend.altiora.utils.logging import setup_logging
 from backend.altiora.api.openapi import custom_openapi
 
-app.openapi = custom_openapi
+
 
 logger = logging.getLogger(__name__)
 

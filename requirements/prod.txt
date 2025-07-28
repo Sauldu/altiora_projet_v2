@@ -1,0 +1,17 @@
+# requirements/prod.txt - Dépendances production optimisées
+-r base.txt
+
+# Production serveur
+gunicorn==21.2.0
+anyio==4.3.0
+
+# Monitoring
+sentry-sdk[fastapi]==1.38.0
+python-json-logger==2.0.7
+
+# Security hardening
+secure==0.3.0
+bandit==1.7.5
+
+# Optional GPU
+nvidia-ml-py==12.535.133
