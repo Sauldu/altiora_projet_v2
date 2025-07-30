@@ -1,37 +1,28 @@
-# backend/altiora/infrastructure/cache/metrics.py
 """
-Métriques du cache (hit/miss, taille, latence).
+Exposition de métriques Prometheus pour le cache.
+Dépend uniquement de `prometheus_client`.
 """
 
-from __future__ import annotations
-
+from prometheus_client import Counter, Gauge, generate_latest
 import time
-from typing import Any
 
-from prometheus_client import Counter, Histogram
+# ---- Métriques ----
+cache_hits = Counter("cache_hits_total", "Nombre de hits dans le cache")
+cache_misses = Counter("cache_misses_total", "Nombre de misses dans le cache")
+cache_size = Gauge("cache_size", "Nombre d’entrées présentes dans le cache")
 
-# --- Métriques du Cache ---
-cache_hits = Counter("cache_hits_total", "Total cache hits")
-cache_misses = Counter("cache_misses_total", "Total cache misses")
-cache_latency = Histogram("cache_latency_seconds", "Cache operation latency")
+# ---- Helpers ----
+def record_hit() -> None:
+    cache_hits.inc()
 
-# --- Métriques du Model Swapper ---
-model_swap_total = Counter("model_swap_total", "Total number of model swaps", ["model_name"])
-model_swap_latency = Histogram("model_swap_latency_seconds", "Latency of model swaps", ["model_name"])
+def record_miss() -> None:
+    cache_misses.inc()
 
+def set_size(n: int) -> None:
+    cache_size.set(n)
 
-class CacheMetrics:
-    """Wrapper qui publie les métriques Prometheus."""
-
-    async def get(self, cache: Any, key: str) -> Any:
-        """Récupère et publie les métriques."""
-        start = time.perf_counter()
-        try:
-            result = await cache.get(key)
-            if result is None:
-                cache_misses.inc()
-            else:
-                cache_hits.inc()
-            return result
-        finally:
-            cache_latency.observe(time.perf_counter() - start)
+def export_metrics() -> bytes:
+    """
+    Renvoie les métriques au format Prometheus text/plain.
+    """
+    return generate_latest()
