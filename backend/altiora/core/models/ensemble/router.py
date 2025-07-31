@@ -1,22 +1,407 @@
 # backend/altiora/core/models/ensemble/router.py
 """
-Router qui choisit dynamiquement le modèle adapté.
+Router intelligent qui choisit dynamiquement le modèle adapté.
+Version améliorée avec détection Playwright et patterns de tests.
 """
 
 from __future__ import annotations
 
-from typing import Any
+import re
+from typing import Dict, List, Optional, Tuple
 
 from altiora.core.models.model_swapper import ModelSwapper
+from altiora.core.models.starcoder2.playwright_templates import TestType
 
 
 class ModelRouter:
     """Décide quel modèle activer selon la tâche demandée."""
 
-    async def route(self, task: str, swapper: ModelSwapper) -> str:
-        """Retourne le nom du modèle à utiliser."""
-        if "code" in task.lower() or "script" in task.lower():
-            await swapper.ensure_model_loaded("starcoder2")
-            return "starcoder2"
-        await swapper.ensure_model_loaded("qwen3")
-        return "qwen3"
+    # Patterns de détection pour routage
+    ROUTING_PATTERNS = {
+        "starcoder2": {
+            # Patterns généraux de code
+            "code_keywords": [
+                r"\b(code|script|function|class|def|async|await)\b",
+                r"\b(python|javascript|typescript|java|c\+\+|golang)\b",
+                r"\b(implement|développe|génère|crée)\s+\w*\s*(code|fonction|classe)",
+            ],
+            # Patterns spécifiques tests
+            "test_keywords": [
+                r"\b(test|tests|testing|pytest|unittest|jest)\b",
+                r"\b(playwright|selenium|cypress|webdriver)\b",
+                r"\b(e2e|end-to-end|api test|component test)\b",
+                r"\b(assertion|expect|should|verify|validate)\b",
+            ],
+            # Patterns Playwright
+            "playwright_specific": [
+                r"\bplaywright\b",
+                r"\b(page\.|browser\.|context\.)",
+                r"\b(click|fill|navigate|screenshot)\b",
+                r"\b(locator|selector|getBy\w+)\b",
+                r"test\(.*async.*page.*\)",
+            ]
+        },
+        "qwen3": {
+            # Analyse et raisonnement
+            "analysis_keywords": [
+                r"\b(analyse|analyze|comprendre|understand|expliquer)\b",
+                r"\b(bug|issue|problème|erreur|défaut)\b",
+                r"\b(rapport|report|documentation|spec|exigence)\b",
+                r"\b(stratégie|plan|approche|méthodologie)\b",
+            ],
+            # Questions générales
+            "general_keywords": [
+                r"\b(pourquoi|comment|quoi|when|where|qui)\b",
+                r"\b(conseil|recommandation|suggestion|aide)\b",
+                r"\b(résumé|summary|synthèse|conclusion)\b",
+            ]
+        },
+        "doctopus": {
+            # OCR et extraction
+            "ocr_keywords": [
+                r"\b(ocr|pdf|image|scan|document)\b",
+                r"\b(extraire|extract|lire|read)\s+\w*\s*(texte|text)",
+                r"\.(pdf|png|jpg|jpeg|tiff|doc|docx)\b",
+            ]
+        }
+    }
+
+    def __init__(self):
+        self.last_routing_decision: Optional[Dict[str, any]] = None
+
+    async def route(
+        self, 
+        task: str, 
+        swapper: ModelSwapper,
+        context: Optional[Dict[str, any]] = None
+    ) -> Tuple[str, Dict[str, any]]:
+        """
+        Route vers le modèle approprié avec métadonnées.
+        
+        Args:
+            task: Description de la tâche
+            swapper: Instance ModelSwapper
+            context: Contexte additionnel (fichiers, historique, etc.)
+            
+        Returns:
+            Tuple (nom_modèle, metadata_routing)
+        """
+        # Analyse de la tâche
+        routing_scores = self._analyze_task(task, context)
+        
+        # Sélection du modèle
+        selected_model = max(routing_scores, key=routing_scores.get)
+        
+        # Métadonnées de routage
+        metadata = {
+            "scores": routing_scores,
+            "detected_patterns": self._get_detected_patterns(task, selected_model),
+            "confidence": routing_scores[selected_model],
+            "fallback_model": self._get_fallback(selected_model, routing_scores),
+        }
+        
+        # Cas spécial : détection Playwright pour StarCoder2
+        if selected_model == "starcoder2":
+            test_type = self._detect_test_type(task)
+            if test_type:
+                metadata["test_type"] = test_type.value
+                metadata["use_playwright_optimizer"] = True
+        
+        # Chargement du modèle
+        await swapper.ensure_model_loaded(selected_model)
+        
+        # Sauvegarde de la décision
+        self.last_routing_decision = {
+            "task": task[:100],
+            "model": selected_model,
+            "metadata": metadata
+        }
+        
+        return selected_model, metadata
+
+    def _analyze_task(
+        self, 
+        task: str, 
+        context: Optional[Dict[str, any]] = None
+    ) -> Dict[str, float]:
+        """
+        Analyse la tâche et calcule les scores pour chaque modèle.
+        
+        Args:
+            task: Description de la tâche
+            context: Contexte additionnel
+            
+        Returns:
+            Dict modèle -> score (0-1)
+        """
+        task_lower = task.lower()
+        scores = {"qwen3": 0.1, "starcoder2": 0.0, "doctopus": 0.0}
+        
+        # Analyse par patterns
+        for model, patterns_dict in self.ROUTING_PATTERNS.items():
+            for pattern_type, patterns in patterns_dict.items():
+                for pattern in patterns:
+                    if re.search(pattern, task_lower):
+                        # Poids différents selon le type de pattern
+                        weight = self._get_pattern_weight(pattern_type)
+                        scores[model] += weight
+        
+        # Boost contextuel
+        if context:
+            scores = self._apply_context_boost(scores, context)
+        
+        # Normalisation
+        total = sum(scores.values())
+        if total > 0:
+            scores = {k: v/total for k, v in scores.items()}
+        
+        return scores
+
+    def _get_pattern_weight(self, pattern_type: str) -> float:
+        """Retourne le poids d'un type de pattern."""
+        weights = {
+            "playwright_specific": 0.4,
+            "test_keywords": 0.3,
+            "code_keywords": 0.2,
+            "ocr_keywords": 0.4,
+            "analysis_keywords": 0.3,
+            "general_keywords": 0.1,
+        }
+        return weights.get(pattern_type, 0.1)
+
+    def _apply_context_boost(
+        self, 
+        scores: Dict[str, float], 
+        context: Dict[str, any]
+    ) -> Dict[str, float]:
+        """Applique des boosts basés sur le contexte."""
+        # Boost si fichiers de code
+        if "files" in context:
+            code_extensions = {".py", ".js", ".ts", ".java", ".cpp"}
+            for file in context["files"]:
+                if any(file.endswith(ext) for ext in code_extensions):
+                    scores["starcoder2"] *= 1.5
+                elif file.endswith((".pdf", ".png", ".jpg")):
+                    scores["doctopus"] *= 2.0
+        
+        # Boost si historique récent
+        if "recent_model" in context:
+            # Favorise la continuité
+            recent = context["recent_model"]
+            if recent in scores:
+                scores[recent] *= 1.2
+        
+        return scores
+
+    def _detect_test_type(self, task: str) -> Optional[TestType]:
+        """Détecte le type de test Playwright."""
+        task_lower = task.lower()
+        
+        # Patterns de détection
+        if any(word in task_lower for word in ["api", "endpoint", "request", "response"]):
+            return TestType.API
+        elif any(word in task_lower for word in ["component", "render", "props"]):
+            return TestType.COMPONENT
+        elif any(word in task_lower for word in ["visual", "screenshot", "regression"]):
+            return TestType.VISUAL
+        elif any(word in task_lower for word in ["a11y", "accessibility", "aria"]):
+            return TestType.ACCESSIBILITY
+        elif "playwright" in task_lower or "e2e" in task_lower:
+            return TestType.E2E
+        
+        return None
+
+    def _get_detected_patterns(self, task: str, model: str) -> List[str]:
+        """Retourne les patterns détectés pour un modèle."""
+        detected = []
+        task_lower = task.lower()
+        
+        if model in self.ROUTING_PATTERNS:
+            for pattern_type, patterns in self.ROUTING_PATTERNS[model].items():
+                for pattern in patterns:
+                    if re.search(pattern, task_lower):
+                        match = re.search(pattern, task_lower)
+                        if match:
+                            detected.append(f"{pattern_type}: {match.group(0)}")
+        
+        return detected[:5]  # Limite à 5 pour la lisibilité
+
+    def _get_fallback(
+        self, 
+        primary: str, 
+        scores: Dict[str, float]
+    ) -> Optional[str]:
+        """Détermine le modèle de fallback."""
+        # Retire le modèle primaire
+        other_scores = {k: v for k, v in scores.items() if k != primary}
+        
+        if not other_scores:
+            return None
+        
+        # Retourne le second meilleur si score > 0.2
+        fallback = max(other_scores, key=other_scores.get)
+        if other_scores[fallback] > 0.2:
+            return fallback
+        
+        return None
+
+    async def route_batch(
+        self,
+        tasks: List[str],
+        swapper: ModelSwapper
+    ) -> Dict[str, List[str]]:
+        """
+        Route plusieurs tâches efficacement.
+        
+        Args:
+            tasks: Liste de tâches
+            swapper: ModelSwapper
+            
+        Returns:
+            Dict modèle -> liste de tâches
+        """
+        routing = {"qwen3": [], "starcoder2": [], "doctopus": []}
+        
+        for task in tasks:
+            model, _ = await self.route(task, swapper)
+            routing[model].append(task)
+        
+        return routing
+
+    def get_routing_explanation(self) -> Optional[str]:
+        """Explique la dernière décision de routage."""
+        if not self.last_routing_decision:
+            return None
+        
+        decision = self.last_routing_decision
+        explanation = [
+            f"Tâche: {decision['task']}",
+            f"Modèle sélectionné: {decision['model']}",
+            f"Confiance: {decision['metadata']['confidence']:.2%}",
+        ]
+        
+        if decision['metadata']['detected_patterns']:
+            explanation.append("Patterns détectés:")
+            for pattern in decision['metadata']['detected_patterns']:
+                explanation.append(f"  - {pattern}")
+        
+        if decision['metadata'].get('test_type'):
+            explanation.append(f"Type de test: {decision['metadata']['test_type']}")
+        
+        return "\n".join(explanation)
+
+
+class AdvancedRouter(ModelRouter):
+    """
+    Router avancé avec apprentissage des préférences.
+    Garde un historique des routages pour améliorer les décisions.
+    """
+    
+    def __init__(self, redis_client: Optional[Redis] = None):
+        super().__init__()
+        self.redis = redis_client
+        self.history_key = "router:history"
+        self.preferences_key = "router:preferences"
+    
+    async def route_with_learning(
+        self,
+        task: str,
+        swapper: ModelSwapper,
+        context: Optional[Dict[str, any]] = None,
+        user_feedback: Optional[bool] = None
+    ) -> Tuple[str, Dict[str, any]]:
+        """
+        Route avec apprentissage des préférences utilisateur.
+        
+        Args:
+            task: Description de la tâche
+            swapper: ModelSwapper
+            context: Contexte
+            user_feedback: Feedback sur le dernier routage
+            
+        Returns:
+            Tuple (modèle, metadata)
+        """
+        # Applique le feedback si disponible
+        if user_feedback is not None and self.last_routing_decision:
+            await self._update_preferences(user_feedback)
+        
+        # Récupère les préférences
+        preferences = await self._get_preferences()
+        
+        # Route normalement
+        model, metadata = await self.route(task, swapper, context)
+        
+        # Ajuste selon les préférences
+        if preferences:
+            adjusted_model = self._adjust_by_preferences(
+                model, 
+                metadata["scores"], 
+                preferences
+            )
+            if adjusted_model != model:
+                metadata["original_choice"] = model
+                metadata["adjusted_by_preferences"] = True
+                model = adjusted_model
+        
+        # Sauvegarde dans l'historique
+        if self.redis:
+            await self._save_to_history(task, model, metadata)
+        
+        return model, metadata
+    
+    async def _update_preferences(self, positive: bool):
+        """Met à jour les préférences basées sur le feedback."""
+        if not self.redis or not self.last_routing_decision:
+            return
+        
+        decision = self.last_routing_decision
+        model = decision["model"]
+        patterns = decision["metadata"]["detected_patterns"]
+        
+        # Incrémente/décrémente les préférences
+        for pattern in patterns:
+            key = f"{self.preferences_key}:{pattern}"
+            if positive:
+                await self.redis.hincrby(key, model, 1)
+            else:
+                await self.redis.hincrby(key, model, -1)
+    
+    async def _get_preferences(self) -> Optional[Dict[str, Dict[str, float]]]:
+        """Récupère les préférences apprises."""
+        # TODO: Implémenter la récupération depuis Redis
+        return None
+    
+    def _adjust_by_preferences(
+        self,
+        model: str,
+        scores: Dict[str, float],
+        preferences: Dict[str, Dict[str, float]]
+    ) -> str:
+        """Ajuste le choix selon les préférences."""
+        # TODO: Implémenter l'ajustement
+        return model
+    
+    async def _save_to_history(
+        self,
+        task: str,
+        model: str,
+        metadata: Dict[str, any]
+    ):
+        """Sauvegarde la décision dans l'historique."""
+        if not self.redis:
+            return
+        
+        import json
+        from datetime import datetime
+        
+        entry = {
+            "timestamp": datetime.now().isoformat(),
+            "task": task[:200],
+            "model": model,
+            "confidence": metadata["confidence"],
+            "patterns": metadata["detected_patterns"][:3]
+        }
+        
+        await self.redis.lpush(self.history_key, json.dumps(entry))
+        await self.redis.ltrim(self.history_key, 0, 999)  # Garde 1000 derniers
